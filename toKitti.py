@@ -78,4 +78,4 @@ if __name__ == '__main__':
 
 	A = convert(X, Y, THETA)
 
-	np.savetxt("ate/vpr4.kitti", A, delimiter=' ')
+	np.savetxt("ate/vpr5.kitti", A, delimiter=' ')

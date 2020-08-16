@@ -107,41 +107,41 @@ def writeG2O(X, Y, THETA, src, trg, trans):
 	g2o.close()
 
 
-def writeG2O(X, Y, THETA, src, trg, trans):
-	g2o = open('lessNoise.g2o', 'w')
+# def writeG2O(X, Y, THETA, src, trg, trans):
+# 	g2o = open('lessNoise.g2o', 'w')
 
-	for i, (x, y, theta) in enumerate(zip(X, Y, THETA)):
-		line = "VERTEX_SE2 " + str(i) + " " + str(x) + " " + str(y) + " " + str(theta)
-		g2o.write(line)
-		g2o.write("\n")	
+# 	for i, (x, y, theta) in enumerate(zip(X, Y, THETA)):
+# 		line = "VERTEX_SE2 " + str(i) + " " + str(x) + " " + str(y) + " " + str(theta)
+# 		g2o.write(line)
+# 		g2o.write("\n")	
 
-	# Odometry
-	# T1_w : 1 with respect to world
-	g2o.write("# Odometry constraints\n")
-	info_mat = "500.0 0.0 0.0 500.0 0.0 500.0"
-	for i in range(1, len(X)):
-		p1 = (X[i-1], Y[i-1], THETA[i-1])
-		p2 = (X[i], Y[i], THETA[i])
-		T1_w = np.array([[math.cos(p1[2]), -math.sin(p1[2]), p1[0]], [math.sin(p1[2]), math.cos(p1[2]), p1[1]], [0, 0, 1]])
-		T2_w = np.array([[math.cos(p2[2]), -math.sin(p2[2]), p2[0]], [math.sin(p2[2]), math.cos(p2[2]), p2[1]], [0, 0, 1]])
-		T2_1 = np.dot(np.linalg.inv(T1_w), T2_w)
-		del_x = str(T2_1[0][2])
-		del_y = str(T2_1[1][2])
-		del_theta = str(math.atan2(T2_1[1, 0], T2_1[0, 0]))
+# 	# Odometry
+# 	# T1_w : 1 with respect to world
+# 	g2o.write("# Odometry constraints\n")
+# 	info_mat = "500.0 0.0 0.0 500.0 0.0 500.0"
+# 	for i in range(1, len(X)):
+# 		p1 = (X[i-1], Y[i-1], THETA[i-1])
+# 		p2 = (X[i], Y[i], THETA[i])
+# 		T1_w = np.array([[math.cos(p1[2]), -math.sin(p1[2]), p1[0]], [math.sin(p1[2]), math.cos(p1[2]), p1[1]], [0, 0, 1]])
+# 		T2_w = np.array([[math.cos(p2[2]), -math.sin(p2[2]), p2[0]], [math.sin(p2[2]), math.cos(p2[2]), p2[1]], [0, 0, 1]])
+# 		T2_1 = np.dot(np.linalg.inv(T1_w), T2_w)
+# 		del_x = str(T2_1[0][2])
+# 		del_y = str(T2_1[1][2])
+# 		del_theta = str(math.atan2(T2_1[1, 0], T2_1[0, 0]))
 
-		line = "EDGE_SE2 "+str(i-1)+" "+str(i)+" "+del_x+" "+del_y+" "+del_theta+" "+info_mat+"\n"
-		g2o.write(line)
+# 		line = "EDGE_SE2 "+str(i-1)+" "+str(i)+" "+del_x+" "+del_y+" "+del_theta+" "+info_mat+"\n"
+# 		g2o.write(line)
 
-	# LC Constraints
-	g2o.write('# Loop Closure constraints\n')
-	info_mat = "700.0 0.0 0.0 700.0 0.0 700.0\n"
-	for i in range(len(src)):
-		del_x, del_y, del_theta = str(trans[i][0]), str(trans[i][1]), str(trans[i][2])
-		line = "EDGE_SE2 "+str(src[i])+" "+str(trg[i])+" "+del_x+" "+del_y+" "+del_theta+" "+info_mat
-		g2o.write(line)
+# 	# LC Constraints
+# 	g2o.write('# Loop Closure constraints\n')
+# 	info_mat = "700.0 0.0 0.0 700.0 0.0 700.0\n"
+# 	for i in range(len(src)):
+# 		del_x, del_y, del_theta = str(trans[i][0]), str(trans[i][1]), str(trans[i][2])
+# 		line = "EDGE_SE2 "+str(src[i])+" "+str(trg[i])+" "+del_x+" "+del_y+" "+del_theta+" "+info_mat
+# 		g2o.write(line)
 
-	g2o.write("FIX 0\n")
-	g2o.close()
+# 	g2o.write("FIX 0\n")
+# 	g2o.close()
 
 
 def optimize():
@@ -223,3 +223,4 @@ if __name__ == '__main__':
 
 
 	drawLC(XAnim, YAnim, TAnim, srcAnim, trgAnim, blk=True)
+	os.system("rm opt.g2o lessNoise.g2o")

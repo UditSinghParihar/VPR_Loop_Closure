@@ -152,7 +152,7 @@ if __name__ == '__main__':
 	draw(X, Y, THETA)
 	# drawTheta(X, Y, THETA)
 	src, trg, trans = readLC(argv[2])
-	drawLC(X, Y, THETA, src, trg)
+	drawLC(X, Y, THETA, src, trg); exit(1)
 	writeG2O(X, Y, THETA, src, trg, trans)
 	# exit(1)
 

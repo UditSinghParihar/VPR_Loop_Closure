@@ -202,4 +202,4 @@ if __name__ == '__main__':
 
 		# writeG2O(X[0:i+1], Y[0:i+1], THETA[0:i+1], srcAnim, trgAnim, transAnim)				
 		# optimize()
-		# (xOpt, yOpt, tOpt) = readG2o("opt.g2o")k
+		# (xOpt, yOpt, tOpt) = readG2o("opt.g2o")

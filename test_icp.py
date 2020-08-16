@@ -51,6 +51,52 @@ def getPointCloud(rgbFile, depthFile):
 	colors = np.asarray(colors)
 
 	pcd = o3d.geometry.PointCloud()
+	print(points.shape, type(points), points.dtype)
+	pcd.points = o3d.utility.Vector3dVector(points)
+	pcd.colors = o3d.utility.Vector3dVector(colors/255)
+	downpcd = pcd.voxel_down_sample(voxel_size=0.01)
+	downpcd.estimate_normals(search_param=o3d.geometry.KDTreeSearchParamHybrid(radius=0.1, max_nn=30))
+
+	axis = o3d.geometry.TriangleMesh.create_coordinate_frame(size=1, origin=[0, 0, 0])
+	o3d.visualization.draw_geometries([downpcd, axis])
+
+
+	return downpcd
+
+
+def getPointCloud2(rgbFile, depthFile):
+	thresh = 5.6
+	
+	depth = np.load(depthFile)
+	rgb = Image.open(rgbFile)
+
+	points = []
+	colors = []
+
+	for v in range(depth.shape[0]):
+		for u in range(depth.shape[1]):
+
+			Z = depth[v, u] / scalingFactor
+			if(Z == 0): continue
+			if(Z > thresh): continue
+
+			X = (u - centerX) * Z / focalLength
+			Y = (v - centerY) * Z / focalLength
+			
+			Xtemp = X; Ytemp = Y; Ztemp = Z
+			X = Ztemp; Y = -Xtemp; Z = -Ytemp
+
+			if(Z < 0): continue
+			if(np.abs(X) > thresh): continue
+			if(np.abs(Y) > thresh): continue
+
+			points.append((X, Y, Z))
+			colors.append(rgb.getpixel((u, v)))
+
+	points = np.asarray(points)
+	colors = np.asarray(colors)
+
+	pcd = o3d.geometry.PointCloud()
 	pcd.points = o3d.utility.Vector3dVector(points)
 	pcd.colors = o3d.utility.Vector3dVector(colors/255)
 	downpcd = pcd.voxel_down_sample(voxel_size=0.01)
@@ -87,17 +133,23 @@ if __name__ == "__main__":
 	# 	o3d.registration.TransformationEstimationPointToPlane())
 	# draw_registration_result(source, target, reg_p2l.transformation)
 
-	focalLength = 617.19
-	centerX = 314.647
-	centerY = 246.577
+	# focalLength = 617.19
+	# centerX = 314.647
+	# centerY = 246.577
+	# scalingFactor = 1000.0
+
+	focalLength = 402.29
+	centerX = 320.5
+	centerY = 240.5
 	scalingFactor = 1000.0
 
 	srcR = argv[1]
 	srcD = argv[2]
-	trgR = argv[3]
-	trgD = argv[4]
+	# trgR = argv[3]
+	# trgD = argv[4]
 
-	srcCld = getPointCloud(srcR, srcD)
+	srcCld = getPointCloud2(srcR, srcD)
+	exit(1)
 	trgCld = getPointCloud(trgR, trgD)
 
 	trans_init = np.identity(4)

@@ -10,15 +10,17 @@ def getCorr(imgFile1, imgFile2):
 	im1 = cv2.imread(imgFile1)
 	im2 = cv2.imread(imgFile2)
 
-	pts_floor = np.array([[180, 299], [460, 290], [585, 443], [66, 462]])
+	# pts_floor = np.array([[180, 299], [460, 290], [585, 443], [66, 462]]) # p3dx
+	pts_floor = np.array([[544,649],[1379,646],[1602,1049],[300,1045]]) # camera cvit 
 	pts_correct = np.array([[0, 0], [399, 0], [399, 399], [0, 399]])
+
 	homographyMat, status = cv2.findHomography(pts_floor, pts_correct)
 	img1 = cv2.warpPerspective(im1, homographyMat, (400, 400))
 	img2 = cv2.warpPerspective(im2, homographyMat, (400, 400))
 
-	cv2.imshow("Image1", img1)
-	cv2.imshow("Image2", img2)
-	cv2.waitKey(0)
+	# cv2.imshow("Image1", img1)
+	# cv2.imshow("Image2", img2)
+	# cv2.waitKey(0)
 
 
 	startPts = np.array([[0, 0], [400, 0], [400, 400], [0, 400]])
@@ -26,9 +28,9 @@ def getCorr(imgFile1, imgFile2):
 	homoFl, status = cv2.findHomography(startPts, endPts)
 	imgFl2 = cv2.warpPerspective(img2, homoFl, (400, 400))
 
-	cv2.imshow("Image1", img1)
-	cv2.imshow("Image2", imgFl2)
-	cv2.waitKey(0)
+	# cv2.imshow("Image1", img1)
+	# cv2.imshow("Image2", imgFl2)
+	# cv2.waitKey(0)
 
 	img2 = imgFl2
 	# exit(1)
@@ -48,6 +50,8 @@ def getCorr(imgFile1, imgFile2):
 	good = good[0:16]
 	print("Number of matches: {}".format(len(good)))
 
+	# print(type(good), len(good), type(good[0])); print("Debugging!"); exit(1)
+
 	if len(good) > MIN_MATCH_COUNT:
 		src_pts = np.float32([ kp1[m.queryIdx].pt for m in good ]).reshape(-1,1,2)
 		dst_pts = np.float32([ kp2[m.trainIdx].pt for m in good ]).reshape(-1,1,2)
@@ -58,8 +62,8 @@ def getCorr(imgFile1, imgFile2):
 						   matchesMask = matchesMask,
 						   flags = 2)
 		img3 = cv2.drawMatches(img1,kp1,img2,kp2,good,None,**draw_params)
-		plt.imshow(img3, 'gray')
-		plt.show()
+		cv2.imshow('Matches', img3)
+		cv2.waitKey(0)
 
 	else:
 		print( "Not enough matches are found - %d/%d" % (len(good),MIN_MATCH_COUNT))
@@ -69,8 +73,8 @@ def getCorr(imgFile1, imgFile2):
 						   matchesMask = matchesMask,
 						   flags = 2)
 		img3 = cv2.drawMatches(img1,kp1,img2,kp2,good,None,**draw_params)
-		plt.imshow(img3, 'gray')
-		plt.show()
+		cv2.imshow('Matches', img3)
+		cv2.waitKey(0)
 
 		exit(1)
 
@@ -93,12 +97,25 @@ def getCorr(imgFile1, imgFile2):
 	imRgb2 = cv2.imread(imgFile2)
 
 	for i in range(orgSrc.shape[1]):
-		im1 = cv2.circle(imRgb1, (int(orgSrc[0, i]), int(orgSrc[1, i])), 5, (0, 0, 255), 3)
+		im1 = cv2.circle(imRgb1, (int(orgSrc[0, i]), int(orgSrc[1, i])), 4, (0, 0, 255), 7)
 	for i in range(orgDst.shape[1]):
-		im2 = cv2.circle(imRgb2, (int(orgDst[0, i]), int(orgDst[1, i])), 5, (0, 0, 255), 3)
-	cv2.imshow("Image1", im1)
-	cv2.imshow("Image2", im2)
+		im2 = cv2.circle(imRgb2, (int(orgDst[0, i]), int(orgDst[1, i])), 4, (0, 0, 255), 7)
+	# cv2.imshow("Image1", im1)
+	# cv2.imshow("Image2", im2)
+	# cv2.waitKey(0)
+
+	im4 = cv2.hconcat([im1, im2])
+	# cv2.imshow("Image_concatenate", im4)
+	# cv2.waitKey(0)
+
+
+	for i in range(orgSrc.shape[1]):
+		im4 = cv2.line(im4, (int(orgSrc[0, i]), int(orgSrc[1, i])), (int(orgDst[0, i]) +  im1.shape[1], int(orgDst[1, i])), (0, 255, 0), 3)
+
+
+	cv2.imshow("Image_lines", im4)
 	cv2.waitKey(0)
+
 
 	return orgSrc, orgDst
 
@@ -109,8 +126,7 @@ if __name__ == '__main__':
 
 	orgSrc, orgDst = getCorr(imgFile1, imgFile2)
 	
-	orgSrc = np.asarray(orgSrc)[0:2, :]
-	orgDst = np.asarray(orgDst)[0:2, :]
-
-	np.savetxt('src_pts.txt', orgSrc, delimiter=' ')
-	np.savetxt('trg_pts.txt', orgDst, delimiter=' ')
+	# orgSrc = np.asarray(orgSrc)[0:2, :]
+	# orgDst = np.asarray(orgDst)[0:2, :]
+	# np.savetxt('src_pts.txt', orgSrc, delimiter=' ')
+	# np.savetxt('trg_pts.txt', orgDst, delimiter=' ')

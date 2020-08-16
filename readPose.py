@@ -140,7 +140,7 @@ def optimize():
 
 if __name__ == '__main__':
 	X, Y, THETA = readPose(argv[1])
-	draw(X, Y, THETA); exit(1)
+	draw(X, Y, THETA)
 	# drawTheta(X, Y, THETA)
 	src, trg = readLC(argv[2])
 	drawLC(X, Y, THETA, src, trg)

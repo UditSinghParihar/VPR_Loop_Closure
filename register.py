@@ -172,7 +172,7 @@ if __name__ == '__main__':
 
 	# X, Y, THETA = readPose(poseFile)
 	X, Y, THETA = readG2o(poseFile)
-	draw(X, Y, THETA)
+	draw(X, Y, THETA); exit(1)
 
 	A = convert(X, Y, THETA)
 
@@ -182,9 +182,9 @@ if __name__ == '__main__':
 		pcd = getPointCloud(rgbDir+rgbSort[i], depthDir+depthSort[i], A[i].reshape(4, 4))
 		assCloud.append(pcd)
 
-		if(i%1000 == 0):
-			print("PointCloud number: ", i)
-			o3d.visualization.draw_geometries(assCloud)
+		# if(i%1000 == 0):
+		# 	print("PointCloud number: ", i)
+		# 	o3d.visualization.draw_geometries(assCloud)
 
 	print("Final Registered")
 	o3d.visualization.draw_geometries(assCloud)
